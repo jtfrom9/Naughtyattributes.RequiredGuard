@@ -48,6 +48,10 @@ namespace NaughtyAttributes.RequiredGuard.Editor
                 if (required == null) continue;
                 if (it.objectReferenceValue != null) continue;
 
+                // Opt-out: [RequiredGuardIgnore] keeps NaughtyAttributes' inspector
+                // warning but excludes the field from Play/Build enforcement.
+                if (PropertyUtility.GetAttribute<RequiredGuardIgnoreAttribute>(it) != null) continue;
+
                 string msg = string.IsNullOrEmpty(required.Message)
                     ? $"{obj.name}.{it.propertyPath} is required but not assigned"
                     : $"{obj.name}.{it.propertyPath}: {required.Message}";

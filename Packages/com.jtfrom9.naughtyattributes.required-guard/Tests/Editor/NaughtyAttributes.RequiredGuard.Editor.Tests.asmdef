@@ -1,6 +1,7 @@
 {
   "name": "NaughtyAttributes.RequiredGuard.Editor.Tests",
   "references": [
+    "NaughtyAttributes.RequiredGuard",
     "NaughtyAttributes.RequiredGuard.Editor",
     "NaughtyAttributes.Core",
     "UnityEditor.TestRunner",

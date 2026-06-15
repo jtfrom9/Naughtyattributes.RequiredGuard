@@ -1,13 +1,7 @@
 {
-  "name": "NaughtyAttributes.RequiredGuard.Editor",
-  "references": [
-    "NaughtyAttributes.RequiredGuard",
-    "NaughtyAttributes.Core",
-    "NaughtyAttributes.Editor"
-  ],
-  "includePlatforms": [
-    "Editor"
-  ],
+  "name": "NaughtyAttributes.RequiredGuard",
+  "references": [],
+  "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": false,
