@@ -1,4 +1,3 @@
-#if NAUGHTY_REQUIRED_GUARD
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -38,4 +37,3 @@ namespace NaughtyAttributes.RequiredGuard.Editor
         }
     }
 }
-#endif

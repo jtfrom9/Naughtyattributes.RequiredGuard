@@ -1,5 +1,5 @@
 {
-  "name": "com.example.naughtyattributes-required-guard",
+  "name": "com.jtfrom9.naughtyattributes.required-guard",
   "version": "0.1.0",
   "displayName": "NaughtyAttributes Required Field Guard",
   "description": "Blocks entering Play mode and fails builds when a [Required] (NaughtyAttributes) ObjectReference field is left unassigned. Opt-in extension; does not modify NaughtyAttributes itself.",

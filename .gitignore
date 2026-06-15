@@ -1,2 +1,29 @@
 # Claude Code local session/project state
 .claude/
+
+# Unity generated folders
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Unity test/run artifacts
+*-results.xml
+*.log
+
+# IDE / generated solution files
+/.vs/
+/.idea/
+*.csproj
+*.sln
+*.unityproj
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
