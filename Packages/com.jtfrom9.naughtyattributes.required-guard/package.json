@@ -4,6 +4,10 @@
   "displayName": "NaughtyAttributes Required Field Guard",
   "description": "Blocks entering Play mode and fails builds when a [Required] (NaughtyAttributes) ObjectReference field is left unassigned. Opt-in extension; does not modify NaughtyAttributes itself.",
   "unity": "2022.3",
+  "author": {
+    "name": "jtfrom9 (Jun Tachikawa)",
+    "url": "https://github.com/jtfrom9"
+  },
   "dependencies": {
     "com.dbrizov.naughtyattributes": "2.1.4"
   },
