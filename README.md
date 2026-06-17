@@ -7,7 +7,8 @@
 Blocks **entering Play mode** and **fails player builds** when a
 [`[Required]`](https://github.com/dbrizov/NaughtyAttributes#required) (NaughtyAttributes)
 ObjectReference field is left unassigned — and surfaces the same violations in the **editor
-console while you edit**, each entry double-clickable to the offending field.
+console while you edit**: click an entry to select the offending GameObject, double-click to
+jump to the field in code.
 
 NaughtyAttributes itself is not modified: this extension reuses its `[Required]` attribute and
 only changes the *behavior* (Play/Build enforcement). **Installing the package is the opt-in** —
@@ -44,29 +45,26 @@ public class Player : MonoBehaviour
 This turns "wrote `null!` but forgot to assign it" from a runtime `NullReferenceException`
 into a Play/Build-time failure.
 
-## How it works
-
-| Part | Assembly | Role |
-|------|----------|------|
-| `RequiredFieldChecker` | Editor | Headless detection logic (unit-tested) |
-| `RequiredPlayModeGuard` | Editor | Validates open scenes and cancels Play on a violation |
-| `RequiredBuildGuard` | Editor | Validates enabled build scenes and fails the build on a violation |
-| `RequiredSceneOpenGuard` | Editor | Logs open-scene violations to the console while editing (report-only) |
-
 ## Editor console reporting
 
 While you edit, violations in the **open scenes** are logged to the console — not only at
 Play/Build. The open scenes are re-scanned (debounced) when you change the hierarchy
 (add / rename / reparent a GameObject, attach / detach a component) or assign the reference,
-so the console keeps reflecting the current state. Each entry reads:
+so the console keeps reflecting the current state.
+
+Each entry reads `<message>: <Component>.<field> [<GameObject/hierarchy/path>]` — for example:
 
 ```
-<message>: <Component>.<field> [<GameObject/hierarchy/path>]
+Required field is not assigned: Player._body [Level/Player]
 ```
 
-and is **double-clickable**, jumping to the field's declaration (`File.cs:line`) via a synthetic
-stack frame. `<message>` is the `[Required("…")]` text, or `Required field is not assigned`
-when none is given.
+`<message>` is the `[Required("…")]` text, or `Required field is not assigned` when none is
+given; the bracket holds the offending GameObject's full hierarchy path. Each entry is both:
+
+- **selectable** — clicking it selects the GameObject in the Hierarchy (and the Inspector), so
+  you can see which object is at fault;
+- **double-clickable** — jumping to the field's declaration (`File.cs:line`) via a synthetic
+  stack frame.
 
 This reporting never blocks (opening or editing a scene can't be aborted) — Play and Build stay
 the hard gates. The console is append-only, so after you fix a field the older entries remain
@@ -74,54 +72,14 @@ until you clear the console.
 
 ## Installation
 
-This package depends on NaughtyAttributes (`com.dbrizov.naughtyattributes`), which is not on
-Unity's built-in registry. Provide a resolvable path for it in the consuming project (either
-option below).
-
-### Option A: OpenUPM (scoped registry)
-
-The recommended way. Via the [OpenUPM CLI](https://openupm.com/docs/getting-started.html):
+Via the [OpenUPM CLI](https://openupm.com/docs/getting-started.html):
 
 ```sh
 openupm add com.jtfrom9.naughtyattributes.required-guard
 ```
 
-This also resolves the NaughtyAttributes dependency from OpenUPM automatically. Or configure the
-scoped registry by hand in `Packages/manifest.json`:
-
-```json
-{
-  "scopedRegistries": [
-    {
-      "name": "OpenUPM",
-      "url": "https://package.openupm.com",
-      "scopes": [
-        "com.jtfrom9",
-        "com.dbrizov.naughtyattributes"
-      ]
-    }
-  ],
-  "dependencies": {
-    "com.jtfrom9.naughtyattributes.required-guard": "1.0.0",
-    "com.dbrizov.naughtyattributes": "2.1.4"
-  }
-}
-```
-
-### Option B: Git URL
-
-`Packages/manifest.json`:
-
-```json
-{
-  "dependencies": {
-    "com.jtfrom9.naughtyattributes.required-guard": "https://github.com/jtfrom9/Naughtyattributes.RequiredGuard.git?path=/Packages/com.jtfrom9.naughtyattributes.required-guard#v1.0.0",
-    "com.dbrizov.naughtyattributes": "https://github.com/dbrizov/NaughtyAttributes.git#v2.1.4"
-  }
-}
-```
-
-> Unity's `?path=` query installs a package from a subfolder of a git repository.
+This also pulls the NaughtyAttributes dependency (`com.dbrizov.naughtyattributes`) from OpenUPM
+automatically.
 
 ## Scan scope
 
@@ -131,24 +89,10 @@ scoped registry by hand in `Packages/manifest.json`:
 | Scenes in `EditorBuildSettings.scenes` (enabled) | only while open | — | ✅ each opened and validated |
 | Standalone Prefab / ScriptableObject assets | out of scope | out of scope | out of scope |
 
-## Limitations (v1.0)
-
-- Detects `[Required]` on **ObjectReference fields** (including those inside nested
-  `[Serializable]` types). **Array / List elements** are out of scope in this version.
-- `[Required]` on non-ObjectReference types (string/int, etc.) is ignored.
-- Standalone Prefab / ScriptableObject assets are not scanned (see table above).
-
-## Development & testing
-
-This repository is itself a Unity project; the package is embedded at
-`Packages/com.jtfrom9.naughtyattributes.required-guard/`. Run the EditMode tests from the Unity
-Test Runner, or via CLI:
-
-```sh
-Unity.exe -batchmode -runTests -projectPath <repo> -testPlatform EditMode -testResults results.xml
-```
-
-(Do not combine `-runTests` with `-quit` — the test runner quits on its own once tests finish.)
+Within a scanned scene, the guard checks **single `[Required]` ObjectReference fields**,
+including those nested inside `[Serializable]` types, on **active and inactive** GameObjects.
+Array/List elements and `[Required]` on value types are not checked (NaughtyAttributes itself
+only validates single reference fields).
 
 ## License
 
