@@ -23,16 +23,27 @@ namespace NaughtyAttributes.RequiredGuard.Editor
             // which is the last point we can still abort cleanly.
             if (state != PlayModeStateChange.ExitingEditMode) return;
 
-            var errors = new List<RequiredFieldChecker.Error>();
+            int errorCount = 0;
             for (int i = 0; i < SceneManager.sceneCount; i++)
             {
                 Scene scene = SceneManager.GetSceneAt(i);
-                if (scene.isLoaded) RequiredFieldChecker.CollectSceneErrors(scene, errors);
+                if (!scene.isLoaded) continue;
+
+                var sceneErrors = new List<RequiredFieldChecker.Error>();
+                RequiredFieldChecker.CollectSceneErrors(scene, sceneErrors);
+                if (sceneErrors.Count == 0) continue;
+
+                errorCount += sceneErrors.Count;
+
+                // The scene-open gate already logged this scene's violations when it was
+                // loaded; don't repeat them. Play is still aborted below regardless.
+                if (RequiredGuardReportLog.IsReported(scene.path)) continue;
+
+                foreach (var e in sceneErrors) RequiredFieldChecker.LogViolation(e);
             }
 
-            if (errors.Count == 0) return;
+            if (errorCount == 0) return;
 
-            foreach (var e in errors) Debug.LogError(e.Message, e.Context);
             EditorApplication.isPlaying = false; // Undo the play request.
         }
     }

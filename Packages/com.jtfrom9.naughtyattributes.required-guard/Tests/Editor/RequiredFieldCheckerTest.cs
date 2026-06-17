@@ -84,7 +84,7 @@ namespace NaughtyAttributes.RequiredGuard.Editor.Tests
 
         private readonly List<UnityObject> _spawned = new List<UnityObject>();
 
-        // Deterministic name so exact message assertions are stable.
+        // Stable instance name for the fixtures (message wording is covered separately).
         private const string FixtureName = "Fix";
 
         private T New<T>() where T : ScriptableObject
@@ -115,7 +115,7 @@ namespace NaughtyAttributes.RequiredGuard.Editor.Tests
         // --- Detection: single ObjectReference ------------------------------
 
         [Test]
-        public void UnassignedRequired_ReportsExactlyOneErrorWithFullMessage()
+        public void UnassignedRequired_ReportsExactlyOneErrorForThatField()
         {
             var obj = New<WithRequired>();
 
@@ -123,7 +123,7 @@ namespace NaughtyAttributes.RequiredGuard.Editor.Tests
 
             Assert.AreEqual(1, errors.Count);
             Assert.AreSame(obj, errors[0].Context);
-            Assert.AreEqual("Fix.reference is required but not assigned", errors[0].Message);
+            Assert.AreEqual("reference", errors[0].PropertyPath);
         }
 
         [Test]
@@ -150,14 +150,15 @@ namespace NaughtyAttributes.RequiredGuard.Editor.Tests
         }
 
         [Test]
-        public void CustomMessage_ProducesExactlyFormattedMessage()
+        public void CustomMessage_IsCapturedOnTheError()
         {
             var obj = New<WithCustomMessage>();
 
             var errors = Collect(obj);
 
             Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Fix.reference: please assign me", errors[0].Message);
+            Assert.AreEqual("reference", errors[0].PropertyPath);
+            Assert.AreEqual("please assign me", errors[0].CustomMessage);
         }
 
         // --- Detection: multiple violations ---------------------------------
@@ -167,16 +168,10 @@ namespace NaughtyAttributes.RequiredGuard.Editor.Tests
         {
             var obj = New<TwoRequired>();
 
-            var messages = Collect(obj).Select(e => e.Message).ToList();
+            var paths = Collect(obj).Select(e => e.PropertyPath).ToList();
 
-            Assert.AreEqual(2, messages.Count);
-            CollectionAssert.AreEquivalent(
-                new[]
-                {
-                    "Fix.first is required but not assigned",
-                    "Fix.second is required but not assigned",
-                },
-                messages);
+            Assert.AreEqual(2, paths.Count);
+            CollectionAssert.AreEquivalent(new[] { "first", "second" }, paths);
         }
 
         // --- Detection: nested [Serializable] -------------------------------
@@ -189,7 +184,7 @@ namespace NaughtyAttributes.RequiredGuard.Editor.Tests
             var errors = Collect(obj);
 
             Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Fix.inner.nestedReference is required but not assigned", errors[0].Message);
+            Assert.AreEqual("inner.nestedReference", errors[0].PropertyPath);
         }
 
         [Test]
@@ -209,7 +204,7 @@ namespace NaughtyAttributes.RequiredGuard.Editor.Tests
             var errors = Collect(obj);
 
             Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual("Fix.mid.deep.deepReference is required but not assigned", errors[0].Message);
+            Assert.AreEqual("mid.deep.deepReference", errors[0].PropertyPath);
         }
 
         // --- Edge cases -----------------------------------------------------
@@ -237,7 +232,7 @@ namespace NaughtyAttributes.RequiredGuard.Editor.Tests
                 List<RequiredFieldChecker.Error> ours =
                     errors.Where(e => ReferenceEquals(e.Context, component)).ToList();
                 Assert.AreEqual(1, ours.Count);
-                StringAssert.Contains("reference", ours[0].Message);
+                Assert.AreEqual("reference", ours[0].PropertyPath);
             }
             finally
             {

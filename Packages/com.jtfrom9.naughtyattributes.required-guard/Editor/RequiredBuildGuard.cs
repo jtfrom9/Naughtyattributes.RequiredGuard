@@ -39,7 +39,7 @@ namespace NaughtyAttributes.RequiredGuard.Editor
                     // keep each violation identifiable in the console (R3) even when
                     // same-named objects exist across multiple build scenes.
                     foreach (var e in sceneErrors)
-                        Debug.LogError($"[{buildScene.path}] {e.Message}", e.Context);
+                        RequiredFieldChecker.LogViolation(e, $"[{buildScene.path}] ");
                     errorCount += sceneErrors.Count;
                 }
             }
