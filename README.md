@@ -6,7 +6,8 @@
 
 Blocks **entering Play mode** and **fails player builds** when a
 [`[Required]`](https://github.com/dbrizov/NaughtyAttributes#required) (NaughtyAttributes)
-ObjectReference field is left unassigned.
+ObjectReference field is left unassigned — and surfaces the same violations in the **editor
+console while you edit**, each entry double-clickable to the offending field.
 
 NaughtyAttributes itself is not modified: this extension reuses its `[Required]` attribute and
 only changes the *behavior* (Play/Build enforcement). **Installing the package is the opt-in** —
@@ -50,6 +51,26 @@ into a Play/Build-time failure.
 | `RequiredFieldChecker` | Editor | Headless detection logic (unit-tested) |
 | `RequiredPlayModeGuard` | Editor | Validates open scenes and cancels Play on a violation |
 | `RequiredBuildGuard` | Editor | Validates enabled build scenes and fails the build on a violation |
+| `RequiredSceneOpenGuard` | Editor | Logs open-scene violations to the console while editing (report-only) |
+
+## Editor console reporting
+
+While you edit, violations in the **open scenes** are logged to the console — not only at
+Play/Build. The open scenes are re-scanned (debounced) when you change the hierarchy
+(add / rename / reparent a GameObject, attach / detach a component) or assign the reference,
+so the console keeps reflecting the current state. Each entry reads:
+
+```
+<message>: <Component>.<field> [<GameObject/hierarchy/path>]
+```
+
+and is **double-clickable**, jumping to the field's declaration (`File.cs:line`) via a synthetic
+stack frame. `<message>` is the `[Required("…")]` text, or `Required field is not assigned`
+when none is given.
+
+This reporting never blocks (opening or editing a scene can't be aborted) — Play and Build stay
+the hard gates. The console is append-only, so after you fix a field the older entries remain
+until you clear the console.
 
 ## Installation
 
@@ -102,13 +123,13 @@ scoped registry by hand in `Packages/manifest.json`:
 
 > Unity's `?path=` query installs a package from a subfolder of a git repository.
 
-## Scan scope (initial version)
+## Scan scope
 
-| Target | Play | Build |
-|--------|------|-------|
-| GameObjects/Components in open scenes | ✅ | — |
-| Scenes in `EditorBuildSettings.scenes` (enabled) | — | ✅ each opened and validated |
-| Standalone Prefab / ScriptableObject assets | out of scope | out of scope |
+| Target | Editor console | Play | Build |
+|--------|----------------|------|-------|
+| GameObjects/Components in open scenes | ✅ live, report-only | ✅ blocks Play | — |
+| Scenes in `EditorBuildSettings.scenes` (enabled) | only while open | — | ✅ each opened and validated |
+| Standalone Prefab / ScriptableObject assets | out of scope | out of scope | out of scope |
 
 ## Limitations (v1.0)
 
