@@ -22,7 +22,8 @@ references as **non-nullable**.
 Under `#nullable enable`, a reference field you intend to assign in the Inspector triggers a
 compiler warning ("non-nullable field must contain a non-null value..."). Silencing it with
 `= null!` tells the compiler "trust me, it's assigned" — but nothing actually guarantees that.
-`[Required]` plus this guard provides the guarantee.
+`[Required]` plus this guard provides that guarantee for the scene fields it covers
+(see [Scan scope](#scan-scope)).
 
 ```csharp
 #nullable enable
@@ -64,7 +65,8 @@ given; the bracket holds the offending GameObject's full hierarchy path. Each en
 - **selectable** — clicking it selects the GameObject in the Hierarchy (and the Inspector), so
   you can see which object is at fault;
 - **double-clickable** — jumping to the field's declaration (`File.cs:line`) via a synthetic
-  stack frame.
+  stack frame (a field nested in a `[Serializable]` type declared in another file falls back to
+  the component's script).
 
 This reporting never blocks (opening or editing a scene can't be aborted) — Play and Build stay
 the hard gates. The console is append-only, so after you fix a field the older entries remain
@@ -72,14 +74,14 @@ until you clear the console.
 
 ## Installation
 
-Via the [OpenUPM CLI](https://openupm.com/docs/getting-started.html):
+Run the [OpenUPM CLI](https://openupm.com/docs/getting-started.html) from your Unity project root:
 
 ```sh
 openupm add com.jtfrom9.naughtyattributes.required-guard
 ```
 
-This also pulls the NaughtyAttributes dependency (`com.dbrizov.naughtyattributes`) from OpenUPM
-automatically.
+This configures the OpenUPM scoped registry and pulls the NaughtyAttributes dependency
+(`com.dbrizov.naughtyattributes`) from OpenUPM automatically.
 
 ## Scan scope
 
@@ -90,9 +92,12 @@ automatically.
 | Standalone Prefab / ScriptableObject assets | out of scope | out of scope | out of scope |
 
 Within a scanned scene, the guard checks **single `[Required]` ObjectReference fields**,
-including those nested inside `[Serializable]` types, on **active and inactive** GameObjects.
-Array/List elements and `[Required]` on value types are not checked (NaughtyAttributes itself
-only validates single reference fields).
+including ones nested inside `[Serializable]` types — even when those types are elements of a
+serialized array/List — on **active and inactive** GameObjects.
+
+`[Required]` on an **array/List itself** (or on a value type) is not supported and is never
+enforced: NaughtyAttributes only validates single reference fields — its inspector just shows a
+"works only on reference types" warning — so individual null elements are not checked.
 
 ## License
 
