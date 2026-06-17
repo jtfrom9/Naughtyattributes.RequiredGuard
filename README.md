@@ -81,7 +81,7 @@ scoped registry by hand in `Packages/manifest.json`:
     }
   ],
   "dependencies": {
-    "com.jtfrom9.naughtyattributes.required-guard": "0.1.0",
+    "com.jtfrom9.naughtyattributes.required-guard": "1.0.0",
     "com.dbrizov.naughtyattributes": "2.1.4"
   }
 }
@@ -94,7 +94,7 @@ scoped registry by hand in `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.jtfrom9.naughtyattributes.required-guard": "https://github.com/jtfrom9/Naughtyattributes.RequiredGuard.git?path=/Packages/com.jtfrom9.naughtyattributes.required-guard#v0.1.0",
+    "com.jtfrom9.naughtyattributes.required-guard": "https://github.com/jtfrom9/Naughtyattributes.RequiredGuard.git?path=/Packages/com.jtfrom9.naughtyattributes.required-guard#v1.0.0",
     "com.dbrizov.naughtyattributes": "https://github.com/dbrizov/NaughtyAttributes.git#v2.1.4"
   }
 }
@@ -110,7 +110,7 @@ scoped registry by hand in `Packages/manifest.json`:
 | Scenes in `EditorBuildSettings.scenes` (enabled) | — | ✅ each opened and validated |
 | Standalone Prefab / ScriptableObject assets | out of scope | out of scope |
 
-## Limitations (v0.1)
+## Limitations (v1.0)
 
 - Detects `[Required]` on **ObjectReference fields** (including those inside nested
   `[Serializable]` types). **Array / List elements** are out of scope in this version.
