@@ -1,5 +1,9 @@
 # NaughtyAttributes Required Field Guard
 
+[![openupm](https://img.shields.io/npm/v/com.jtfrom9.naughtyattributes.required-guard?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.jtfrom9.naughtyattributes.required-guard/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![Unity](https://img.shields.io/badge/Unity-2022.3%2B-black?logo=unity)
+
 Blocks **entering Play mode** and **fails player builds** when a
 [`[Required]`](https://github.com/dbrizov/NaughtyAttributes#required) (NaughtyAttributes)
 ObjectReference field is left unassigned.
@@ -39,29 +43,10 @@ public class Player : MonoBehaviour
 This turns "wrote `null!` but forgot to assign it" from a runtime `NullReferenceException`
 into a Play/Build-time failure.
 
-## Opting a field out: `[RequiredGuardIgnore]`
-
-For a field that should still show the `[Required]` Inspector warning but must **not** block
-Play/Build (e.g. assigned at runtime), add the opt-out marker:
-
-```csharp
-#nullable enable
-using NaughtyAttributes;
-using NaughtyAttributes.RequiredGuard;
-using UnityEngine;
-
-public class Spawner : MonoBehaviour
-{
-    // Still shows the red Inspector warning, but the guard won't block (assigned at runtime).
-    [SerializeField, Required, RequiredGuardIgnore] private GameObject _spawned = null!;
-}
-```
-
 ## How it works
 
 | Part | Assembly | Role |
 |------|----------|------|
-| `RequiredGuardIgnoreAttribute` | Runtime | Opt-out marker excluding a field from Play/Build blocking |
 | `RequiredFieldChecker` | Editor | Headless detection logic (unit-tested) |
 | `RequiredPlayModeGuard` | Editor | Validates open scenes and cancels Play on a violation |
 | `RequiredBuildGuard` | Editor | Validates enabled build scenes and fails the build on a violation |
@@ -72,22 +57,16 @@ This package depends on NaughtyAttributes (`com.dbrizov.naughtyattributes`), whi
 Unity's built-in registry. Provide a resolvable path for it in the consuming project (either
 option below).
 
-### Option A: Git URL
+### Option A: OpenUPM (scoped registry)
 
-`Packages/manifest.json`:
+The recommended way. Via the [OpenUPM CLI](https://openupm.com/docs/getting-started.html):
 
-```json
-{
-  "dependencies": {
-    "com.jtfrom9.naughtyattributes.required-guard": "https://github.com/jtfrom9/Naughtyattributes.RequiredGuard.git?path=/Packages/com.jtfrom9.naughtyattributes.required-guard#v0.1.0",
-    "com.dbrizov.naughtyattributes": "https://github.com/dbrizov/NaughtyAttributes.git#v2.1.4"
-  }
-}
+```sh
+openupm add com.jtfrom9.naughtyattributes.required-guard
 ```
 
-> Unity's `?path=` query installs a package from a subfolder of a git repository.
-
-### Option B: OpenUPM (scoped registry)
+This also resolves the NaughtyAttributes dependency from OpenUPM automatically. Or configure the
+scoped registry by hand in `Packages/manifest.json`:
 
 ```json
 {
@@ -108,11 +87,20 @@ option below).
 }
 ```
 
-Or via the OpenUPM CLI:
+### Option B: Git URL
 
-```sh
-openupm add com.jtfrom9.naughtyattributes.required-guard
+`Packages/manifest.json`:
+
+```json
+{
+  "dependencies": {
+    "com.jtfrom9.naughtyattributes.required-guard": "https://github.com/jtfrom9/Naughtyattributes.RequiredGuard.git?path=/Packages/com.jtfrom9.naughtyattributes.required-guard#v0.1.0",
+    "com.dbrizov.naughtyattributes": "https://github.com/dbrizov/NaughtyAttributes.git#v2.1.4"
+  }
+}
 ```
+
+> Unity's `?path=` query installs a package from a subfolder of a git repository.
 
 ## Scan scope (initial version)
 
@@ -128,8 +116,6 @@ openupm add com.jtfrom9.naughtyattributes.required-guard
   `[Serializable]` types). **Array / List elements** are out of scope in this version.
 - `[Required]` on non-ObjectReference types (string/int, etc.) is ignored.
 - Standalone Prefab / ScriptableObject assets are not scanned (see table above).
-- Fields marked `[RequiredGuardIgnore]` are excluded from Play/Build blocking (the Inspector
-  warning is still drawn by NaughtyAttributes).
 
 ## Development & testing
 

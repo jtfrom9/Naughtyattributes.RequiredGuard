@@ -47,13 +47,6 @@ namespace NaughtyAttributes.RequiredGuard.Editor.Tests
             [Required("please assign me")] public Dummy reference;
         }
 
-        private class RequiredButGuardIgnored : ScriptableObject
-        {
-            // [Required] still drives the inspector warning, but [RequiredGuardIgnore]
-            // opts this field out of Play/Build blocking.
-            [Required, RequiredGuardIgnore] public Dummy reference;
-        }
-
         [Serializable]
         public class Inner
         {
@@ -165,14 +158,6 @@ namespace NaughtyAttributes.RequiredGuard.Editor.Tests
 
             Assert.AreEqual(1, errors.Count);
             Assert.AreEqual("Fix.reference: please assign me", errors[0].Message);
-        }
-
-        [Test]
-        public void RequiredWithGuardIgnore_IsNotReported()
-        {
-            // The opt-out marker suppresses the guard even though the [Required]
-            // ObjectReference is unassigned.
-            Assert.AreEqual(0, Collect(New<RequiredButGuardIgnored>()).Count);
         }
 
         // --- Detection: multiple violations ---------------------------------

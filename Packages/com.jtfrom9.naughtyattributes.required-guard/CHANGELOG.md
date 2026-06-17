@@ -8,7 +8,6 @@ All notable changes to this package will be documented in this file.
 - `RequiredFieldChecker`: headless detector for unassigned `[Required]` ObjectReference fields.
 - `RequiredPlayModeGuard`: cancels entering Play mode when an open scene has violations.
 - `RequiredBuildGuard`: fails the build when an enabled build scene has violations.
-- `RequiredGuardIgnoreAttribute` (Runtime): opt a single `[Required]` field out of Play/Build blocking.
 - EditMode tests for the detection logic.
 
 ### Notes

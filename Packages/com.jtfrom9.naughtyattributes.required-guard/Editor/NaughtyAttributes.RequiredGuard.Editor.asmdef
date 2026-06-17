@@ -1,7 +1,6 @@
 {
   "name": "NaughtyAttributes.RequiredGuard.Editor",
   "references": [
-    "NaughtyAttributes.RequiredGuard",
     "NaughtyAttributes.Core",
     "NaughtyAttributes.Editor"
   ],
